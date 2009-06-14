@@ -5,12 +5,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 
 public class FractalActivity extends Activity {
 	public static final int MENU_START = 1;
 	public static final int MENU_STOP  = 2;
 	public static final int MENU_PAUSE = 3;
+	public static final int MENU_SETUP = 4;
+	public static final int MENU_SETUP_ZOOM       = 5;
+	public static final int MENU_SETUP_ZOOM_RESET = 6;
+	public static final int MENU_SETUP_COLOR      = 7;
 	
+	public static final int MENU_SETUP_ID = 1;
+		
     private FractalView view;
     
     @Override
@@ -28,7 +35,13 @@ public class FractalActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
     	menu.add(Menu.NONE, MENU_START, 1, "Start");
     	menu.add(Menu.NONE, MENU_PAUSE, 2, "Pause");
-    	menu.add(Menu.NONE, MENU_STOP, 3, "Stop");
+    	menu.add(Menu.NONE, MENU_STOP,  3, "Stop");
+    	
+    	SubMenu setup = menu.addSubMenu(Menu.NONE, MENU_SETUP, 4, "Setup");
+    	
+    	setup.add(MENU_SETUP_ID, MENU_SETUP_ZOOM, 1, "Zoom");
+    	setup.add(MENU_SETUP_ID, MENU_SETUP_ZOOM_RESET, 2, "Reset Zoom");
+    	setup.add(MENU_SETUP_ID, MENU_SETUP_COLOR, 3, "Color");
     	
     	return true;
     }
@@ -41,6 +54,9 @@ public class FractalActivity extends Activity {
     	item.setEnabled(running);
     	
     	item = menu.findItem(MENU_START);
+    	item.setEnabled(!running);
+    	
+    	item = menu.findItem(MENU_SETUP);
     	item.setEnabled(!running);
     	
     	return true;
@@ -58,6 +74,12 @@ public class FractalActivity extends Activity {
     	case MENU_STOP:
     		view.stop();
     		return true;
+    	case MENU_SETUP_ZOOM:
+    		view.setZoomSelectionMode();
+    		return true;
+    	case MENU_SETUP_ZOOM_RESET:
+    		view.resetZoom();
+    		return true;
     	}
     	
     	return false;
@@ -72,11 +94,7 @@ public class FractalActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
     	Log.i("FractalActivity", "onWindowFocusChanged() " + hasFocus);
-    	
-    	if (hasFocus) {
-    		view.calculate();
-    	}
-    	
+
     	super.onWindowFocusChanged(hasFocus);
     }
     

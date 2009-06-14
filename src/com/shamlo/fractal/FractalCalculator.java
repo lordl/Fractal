@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.View;
 
@@ -21,6 +22,11 @@ public class FractalCalculator implements Runnable {
 	private boolean smooth = false;
 	private int[][] result;
 	private int completed;
+	
+	private double minRe = -2.0;
+	private double maxRe = 1.0;
+	private double minIm = -1.0;
+	private double maxIm = 1.0;
 
 	public FractalCalculator(View view) {
 		
@@ -65,13 +71,45 @@ public class FractalCalculator implements Runnable {
 	}
 
 	public void run() {
-		double minRe = -2.0;
-		double maxRe = 1.0;
-		double minIm = -1.0;
-		double maxIm = 1.0;
-	
 		calculate(completed, minRe, maxRe, minIm, maxIm);
 		active = false;
+	}
+	
+	public void zoomToArea(int x, int y, int width, int height) {
+		double Re_factor;
+		double Im_factor;
+
+		if (landscape) {
+			height = (int)((this.height/(float)this.width)*width);
+			
+			Re_factor = (maxRe-minRe)/(this.height-1);
+			Im_factor = (maxIm-minIm)/(this.width-1);
+			
+			minIm = minIm + x*Im_factor;
+			maxIm = minIm + (x+width)*Im_factor;
+			
+			minRe = minRe + y*Re_factor;
+			maxRe = minRe + (y+height)*Re_factor;
+		}
+		else {
+			Re_factor = (maxRe-minRe)/(this.width-1);
+			Im_factor = (maxIm-minIm)/(this.height-1);
+			
+			minRe = x*Re_factor;
+			maxRe = (x+width)*Re_factor;
+			
+			minIm = y*Im_factor;
+			maxIm = (y+height)*Im_factor;
+		}
+		
+		Log.i("FractalActivty", "New ("+x+", "+y+", "+ width+", "+height+"): " + minIm + ", " + maxIm + "; " + minRe + ", " + maxRe);
+	}
+	
+	public void resetArea() {
+		minRe = -2.0;
+		maxRe = 1.0;
+		minIm = -1.0;
+		maxIm = 1.0;
 	}
 
 	/*
