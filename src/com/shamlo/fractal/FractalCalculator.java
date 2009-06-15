@@ -73,11 +73,16 @@ public class FractalCalculator implements Runnable {
 	public void run() {
 		calculate(completed, minRe, maxRe, minIm, maxIm);
 		active = false;
+		
+		if (completed == height - 1) {
+			completed = 0;
+		}
 	}
 	
 	public void zoomToArea(int x, int y, int width, int height) {
 		double Re_factor;
 		double Im_factor;
+		double tmpMin;
 
 		if (landscape) {
 			height = (int)((this.height/(float)this.width)*width);
@@ -85,21 +90,25 @@ public class FractalCalculator implements Runnable {
 			Re_factor = (maxRe-minRe)/(this.height-1);
 			Im_factor = (maxIm-minIm)/(this.width-1);
 			
-			minIm = minIm + x*Im_factor;
-			maxIm = minIm + (x+width)*Im_factor;
+			tmpMin = minIm;
+			minIm = tmpMin + x*Im_factor;
+			maxIm = tmpMin + (x+width)*Im_factor;
 			
-			minRe = minRe + y*Re_factor;
-			maxRe = minRe + (y+height)*Re_factor;
+			tmpMin = minRe;
+			minRe = tmpMin + y*Re_factor;
+			maxRe = tmpMin + (y+height)*Re_factor;
 		}
 		else {
 			Re_factor = (maxRe-minRe)/(this.width-1);
 			Im_factor = (maxIm-minIm)/(this.height-1);
 			
-			minRe = x*Re_factor;
-			maxRe = (x+width)*Re_factor;
+			tmpMin = minRe;
+			minRe  = minRe + x*Re_factor;
+			maxRe  = minRe + (x+width)*Re_factor;
 			
-			minIm = y*Im_factor;
-			maxIm = (y+height)*Im_factor;
+			tmpMin = minIm;
+			minIm  = tmpMin + y*Im_factor;
+			maxIm  = tmpMin + (y+height)*Im_factor;
 		}
 		
 		Log.i("FractalActivty", "New ("+x+", "+y+", "+ width+", "+height+"): " + minIm + ", " + maxIm + "; " + minRe + ", " + maxRe);

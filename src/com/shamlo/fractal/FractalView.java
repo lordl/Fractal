@@ -41,8 +41,13 @@ public class FractalView extends SurfaceView implements Callback {
 	}
 
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.i("FractalActivity", "Surface created");
+		Log.i("Fractal", "Surface created");
 		this.holder = holder;
+		Canvas c = holder.lockCanvas();
+		if (c != null) {
+			c.drawColor(Color.WHITE);
+			holder.unlockCanvasAndPost(c);
+		}
 	}
 
 	public void surfaceDestroyed(SurfaceHolder holder) {
@@ -78,8 +83,15 @@ public class FractalView extends SurfaceView implements Callback {
 	private int w = 0;
 	private int h = 0;
 	private boolean zoomMode = false;
+	private Bitmap zoomSurface;
 	public void setZoomSelectionMode() {
 		zoomMode = true;
+		zoomSurface = Bitmap.createBitmap(getWidth(), getHeight(), Config.ARGB_8888);
+		zoomSurface.eraseColor(Color.RED);
+		
+		Canvas canvas = new Canvas(zoomSurface);
+		
+		this.draw(canvas);
 	}
 
 
@@ -96,31 +108,39 @@ public class FractalView extends SurfaceView implements Callback {
 				y = (int)event.getY();
 				
 				ret = true;
+				Log.i("Fractal", "onTouchEvent:ACTION_DOWN");
 			}
 			else if (event.getAction() == MotionEvent.ACTION_UP) {
 				w = ((int)event.getX()) - x;
 				h = ((int)event.getY()) - y;
 				
-				if (w > x && h > y) {
+				if (w > 0 && h > 0) {
 					zoomMode = false;
 					calculator.zoomToArea(x, y, w, h);
 					
 					Canvas c = holder.lockCanvas();
 					if (c != null) {
-						c.drawColor(Color.WHITE);
+						c.drawBitmap(zoomSurface, 0, 0, null);
+						
+						Paint p = new Paint();
+						p.setColor(Color.WHITE);
+						p.setAlpha(30);
+						
+						c.drawRect(0, 0, getWidth(), getHeight(), p);
 						
 						holder.unlockCanvasAndPost(c);
 					}
 				}
 				
 				ret = true;
+				Log.i("Fractal", "onTouchEvent:ACTION_UP(" + x + ", " + y +", " + w +", " + h +")");
 			}
 			else if (event.getAction() == MotionEvent.ACTION_MOVE) {
 				int nx = (int)event.getX();
 				int ny = (int)event.getY();
 				
-				Canvas c = holder.lockCanvas();
-				
+				Rect r = new Rect(x, y, nx, ny);
+				Canvas c = holder.lockCanvas(r);
 				if (c != null) {
 					
 					Paint stroke = new Paint();
@@ -130,9 +150,10 @@ public class FractalView extends SurfaceView implements Callback {
 					Paint fill = new Paint();
 					fill.setColor(Color.CYAN);
 					fill.setStyle(Style.FILL);
-					fill.setAlpha(100);
+					fill.setAlpha(50);
+				
+					c.drawBitmap(zoomSurface, r, r, null);
 					
-					Rect r = new Rect(x, y, nx, ny);
 					c.drawRect(r, fill);
 					c.drawRect(r, stroke);
 					
