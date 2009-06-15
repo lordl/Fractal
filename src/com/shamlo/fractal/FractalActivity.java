@@ -28,7 +28,7 @@ public class FractalActivity extends Activity {
         setContentView(view);
         
         
-        Log.i("FractalActivity", "onCreate() done.");
+        Log.i("Fractal", "onCreate() done.");
     }
     
     @Override
@@ -93,14 +93,14 @@ public class FractalActivity extends Activity {
     
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
-    	Log.i("FractalActivity", "onWindowFocusChanged() " + hasFocus);
+    	Log.i("Fractal", "onWindowFocusChanged() " + hasFocus);
 
     	super.onWindowFocusChanged(hasFocus);
     }
     
     @Override
     protected void onResume() {
-    	Log.i("FractalActivity","onResume()");
+    	Log.i("Fractal","onResume()");
     	super.onResume();
     }
 }
